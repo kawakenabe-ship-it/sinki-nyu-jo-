@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>新規入場時教育実施報告書（個人票）</title>
+<style>
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: "MS Gothic", "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+    font-size: 11px;
+    margin: 0;
+    padding: 20px;
+    background: #f5f5f5;
+    color: #000;
+  }
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: #fff;
+    padding: 15mm;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  .header-line {
+    text-align: right;
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.3em;
+    margin: 4px 0 10px 0;
+  }
+  table.form {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1.5px solid #000;
+  }
+  table.form td {
+    border: 1px solid #000;
+    padding: 2px 6px;
+    vertical-align: middle;
+    line-height: 1.4;
+  }
+  .label {
+    background: #fff;
+    text-align: center;
+    letter-spacing: 0.4em;
+    white-space: nowrap;
+    width: 90px;
+  }
+  .label-narrow {
+    text-align: center;
+    letter-spacing: 0.2em;
+    white-space: nowrap;
+  }
+  input[type="text"] {
+    border: none;
+    border-bottom: 1px dotted #999;
+    background: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 1px 2px;
+    outline: none;
+  }
+  input[type="text"]:focus {
+    background: #fffbe6;
+    border-bottom: 1px solid #333;
+  }
+  input.w-short { width: 30px; }
+  input.w-mid   { width: 60px; }
+  input.w-long  { width: 120px; }
+  input.w-xl    { width: 200px; }
+  input.w-full  { width: 95%; }
+  .inline { display: inline-block; }
+  .check-list label {
+    display: inline-block;
+    margin-right: 10px;
+    white-space: nowrap;
+  }
+  .check-list .row {
+    margin: 2px 0;
+  }
+  .qual-row {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 6px;
+    margin: 3px 0;
+    align-items: start;
+  }
+  .qual-label {
+    white-space: nowrap;
+  }
+  .footer-text {
+    line-height: 1.8;
+    padding: 8px 10px;
+  }
+  .footer-text .sign {
+    text-align: right;
+    margin-top: 6px;
+  }
+  .doc-no {
+    text-align: right;
+    font-size: 10px;
+    margin-top: 4px;
+  }
+  .confirm-stamp {
+    width: 80px;
+    text-align: center;
+    vertical-align: top;
+  }
+  .confirm-stamp .label-small {
+    letter-spacing: 0.3em;
+    padding: 4px 0;
+  }
+  .stamp-box {
+    height: 70px;
+    position: relative;
+    background: #fff;
+  }
+  .stamp-canvas {
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    display: block;
+    touch-action: none;
+  }
+  .stamp-clear {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    font-size: 9px;
+    padding: 1px 4px;
+    background: #fff;
+    border: 1px solid #999;
+    border-radius: 2px;
+    cursor: pointer;
+    line-height: 1;
+    color: #666;
+  }
+  .stamp-clear:hover {
+    background: #f0f0f0;
+  }
+  /* 氏名用 手書きキャンバス */
+  .name-box {
+    position: relative;
+    height: 100%;
+    min-height: 38px;
+    background: #fff;
+  }
+  .name-canvas {
+    width: 100%;
+    height: 38px;
+    cursor: crosshair;
+    display: block;
+    touch-action: none;
+  }
+  .name-clear {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 9px;
+    padding: 1px 5px;
+    background: #fff;
+    border: 1px solid #999;
+    border-radius: 2px;
+    cursor: pointer;
+    line-height: 1;
+    color: #666;
+  }
+  .name-clear:hover {
+    background: #f0f0f0;
+  }
+  .ruby {
+    font-size: 9px;
+  }
+  /* 印刷用 */
+  @media print {
+    body {
+      background: #fff;
+      padding: 0;
+    }
+    .page {
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: auto;
+    }
+    .no-print { display: none; }
+    input[type="text"] {
+      border-bottom: 1px solid #000;
+    }
+  }
+  .print-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background: #2c5282;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .print-btn:hover {
+    background: #2a4365;
+  }
+  /* モーダルダイアログ */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show {
+    display: flex;
+  }
+  .modal-box {
+    background: #fff;
+    border-radius: 6px;
+    padding: 20px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    font-size: 13px;
+  }
+  .modal-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .modal-msg {
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .modal-input {
+    width: 100%;
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: 13px;
+    border: 1px solid #999;
+    border-radius: 3px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+  }
+  .modal-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .modal-btns button {
+    padding: 6px 14px;
+    font-size: 13px;
+    border: 1px solid #999;
+    border-radius: 3px;
+    cursor: pointer;
+    background: #fff;
+  }
+  .modal-btns button.primary {
+    background: #2c5282;
+    color: #fff;
+    border-color: #2c5282;
+  }
+  .modal-btns button.danger {
+    background: #c53030;
+    color: #fff;
+    border-color: #c53030;
+  }
+  /* 文字全体を〇で囲む選択スタイル */
+  .opt {
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+    padding: 0 2px;
+  }
+  .opt input[type="radio"] {
+    display: none;
+  }
+  .opt .txt {
+    display: inline-block;
+    padding: 1px 8px;
+    border: 1.5px solid transparent;
+    border-radius: 40%;
+    transition: all 0.15s;
+  }
+  .opt input[type="radio"]:checked + .txt {
+    border-color: #c00;
+    color: #c00;
+    font-weight: bold;
+  }
+  .opt:hover .txt {
+    background: #f8f8f8;
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">印刷 / PDF保存</button>
+
+<div class="page">
+
+  <div class="header-line">
+    制定：2001年09月01日　　改訂：　年　　月　　日　　第 1 版
+  </div>
+
+  <h1>新規入場時教育実施報告書（個人票）</h1>
+
+  <table class="form">
+    <!-- 実施年月日 / 作業所名 -->
+    <tr>
+      <td class="label" style="width: 90px;">実施年月日</td>
+      <td style="width: 22%;">
+        <input type="date" id="jisshiDate" onchange="updateWareki()" style="font-family: inherit; font-size: 11px; padding: 2px; border: 1px solid #999;">
+        <div id="warekiDisplay" style="font-size: 10px; color: #555; margin-top: 2px; padding-left: 2px;">令和　年　月　日</div>
+      </td>
+      <td class="label-narrow" style="width: 60px;">作業所名</td>
+      <td>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <select id="sagyoSelect" style="font-family: inherit; font-size: 11px; padding: 2px 4px; border: 1px solid #999; flex: 1;">
+            <option value="大井川地区（東沢）直轄治山工事（R7補正）" selected>大井川地区（東沢）直轄治山工事（R7補正）</option>
+          </select>
+          <button type="button" class="no-print" onclick="addSagyo()" title="追加" style="font-size: 11px; padding: 2px 8px; background: #2c5282; color: #fff; border: none; border-radius: 3px; cursor: pointer;">＋</button>
+          <button type="button" class="no-print" onclick="removeSagyo()" title="削除" style="font-size: 11px; padding: 2px 8px; background: #c53030; color: #fff; border: none; border-radius: 3px; cursor: pointer;">－</button>
+        </div>
+      </td>
+    </tr>
+
+    <!-- 氏名 -->
+    <tr>
+      <td class="label">氏　　　名</td>
+      <td colspan="3" style="padding: 0; height: 42px;">
+        <div class="name-box">
+          <canvas class="name-canvas" id="nameCanvas" width="1400" height="60"></canvas>
+          <button type="button" class="name-clear no-print" onclick="clearCanvas('nameCanvas')">消去</button>
+        </div>
+      </td>
+    </tr>
+
+    <!-- 血液型 / 生年月日 / 職種 -->
+    <tr style="height: 22px;">
+      <td class="label">血　液　型</td>
+      <td style="width: 38px; white-space: nowrap; text-align: center; padding: 2px 2px; font-size: 9.5px; letter-spacing: -1px;">
+        <select style="font-size: 10px; padding: 0; border: 1px solid #999; background: transparent;">
+          <option value=""></option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="O">O</option>
+          <option value="AB">AB</option>
+        </select> 型
+      </td>
+      <td class="label-narrow" style="width: 60px;">生年月日</td>
+      <td style="padding: 2px 4px;">
+        <label><input type="radio" name="era">大正</label>・<label><input type="radio" name="era">昭和</label>　
+        <input type="text" class="w-short"> 年
+        <input type="text" class="w-short"> 月
+        <input type="text" class="w-short"> 日
+        （満 <input type="text" class="w-short"> 才）
+        　職種 <input type="text" class="w-mid">
+      </td>
+    </tr>
+
+    <!-- 住所 -->
+    <tr>
+      <td class="label">住　　　所</td>
+      <td colspan="3" style="height: 42px;"><input type="text" class="w-full" style="height: 28px; font-size: 13px;"></td>
+    </tr>
+
+    <!-- 家族連絡先 -->
+    <tr>
+      <td class="label">家族連絡先</td>
+      <td colspan="3" style="height: 42px;"><input type="text" class="w-full" style="height: 28px; font-size: 13px;"></td>
+    </tr>
+
+    <!-- 家族の氏名 / 電話 -->
+    <tr>
+      <td class="label">家族の氏名</td>
+      <td><input type="text" class="w-long"></td>
+      <td class="label-narrow">電　話</td>
+      <td>
+        （<input type="text" class="w-short">）
+        <input type="text" class="w-mid"> －
+        <input type="text" class="w-mid">
+      </td>
+    </tr>
+
+    <!-- 所属会社名 -->
+    <tr>
+      <td class="label">所属会社名</td>
+      <td colspan="3">
+        <input type="text" class="w-xl">
+        　　
+        <label><input type="radio" name="jisha">一次</label>　
+        <label><input type="radio" name="jisha">二次</label>　
+        <label><input type="radio" name="jisha">三次</label>
+      </td>
+    </tr>
+
+    <!-- 経験年数 -->
+    <tr>
+      <td class="label">経験年数</td>
+      <td colspan="3">
+        所属会社へ入社したのはいつですか、　
+        <input type="text" class="w-short"> 年
+        <input type="text" class="w-short"> 月
+        <input type="text" class="w-short"> 日
+        <br>
+        この仕事を始めて何年になりますか、　
+        <input type="text" class="w-short"> 年
+        <input type="text" class="w-short"> ヶ月
+      </td>
+    </tr>
+
+    <!-- 資格の確認 -->
+    <tr>
+      <td class="label">資格の確認</td>
+      <td colspan="3" class="check-list">
+        <div class="qual-row">
+          <span class="qual-label">・作業主任者</span>
+          <span>
+            <label><input type="checkbox">地山の掘削</label>
+            <label><input type="checkbox">土止め支保工</label>
+            <label><input type="checkbox">型枠支保工組立</label>
+            <label><input type="checkbox">足場の組立</label>
+            <br>
+            <label style="margin-left:0;"><input type="checkbox">鉄骨の組立</label>
+            <label><input type="checkbox">有機溶剤</label>
+            <label><input type="checkbox">コンクリート工作物解体</label>
+          </span>
+        </div>
+        <div class="qual-row">
+          <span class="qual-label">・技能講習</span>
+          <span>
+            <label><input type="checkbox">玉掛け</label>
+            <label><input type="checkbox">ガス溶接</label>
+            <label><input type="checkbox">車輌系建設機械運転</label>
+          </span>
+        </div>
+        <div class="qual-row">
+          <span class="qual-label">・特別教育</span>
+          <span>
+            <label><input type="checkbox">アーク溶接</label>
+            <label><input type="checkbox">クレーン</label>
+            <label><input type="checkbox">移動式クレーン</label>
+            <label><input type="checkbox">建設用リフト</label>
+            <br>
+            <label style="margin-left:0;"><input type="checkbox">酸欠</label>
+            <label><input type="checkbox">電気取扱（低圧、高圧）</label>
+            <label><input type="checkbox">巻き上げ機</label>
+          </span>
+        </div>
+        <div class="qual-row">
+          <span class="qual-label">・その他資格</span>
+          <span><input type="text" class="w-full"></span>
+        </div>
+        <div style="text-align:center; margin-top: 4px;">
+          職長教育　
+          <label><input type="radio" name="shokucho">有</label>・
+          <label><input type="radio" name="shokucho">無</label>
+        </div>
+      </td>
+    </tr>
+
+    <!-- 健康診断 -->
+    <tr>
+      <td class="label">健康診断</td>
+      <td colspan="3">
+        あなたは、健康診断を受けましたか。<br>
+        （1）<label class="opt"><input type="radio" name="kenshin"><span class="txt">受けた</span></label>（<input type="text" class="w-short"> 年
+        <input type="text" class="w-short"> 月）受けた時の血圧　
+        最高：<input type="text" class="w-mid">　
+        最低：<input type="text" class="w-mid"><br>
+        （2）<label class="opt"><input type="radio" name="kenshin"><span class="txt">受けていない</span></label>
+      </td>
+    </tr>
+
+    <!-- 特殊健康診断 -->
+    <tr>
+      <td class="label">特　　殊<br>健康診断</td>
+      <td colspan="3">
+        特殊健康診断を受けた人のみ記入してください。<br>
+        （1）塵　肺：<input type="text" class="w-short"> 年
+        <input type="text" class="w-short"> 月　　
+        場所：<input type="text" class="w-mid">　　
+        結果：<input type="text" class="w-mid"><br>
+        （2）有機溶剤：<input type="text" class="w-short"> 年
+        <input type="text" class="w-short"> 月　　
+        場所：<input type="text" class="w-mid">　　
+        結果：<input type="text" class="w-mid"><br>
+        （3）振動病：<input type="text" class="w-short"> 年
+        <input type="text" class="w-short"> 月　　
+        場所：<input type="text" class="w-mid">　　
+        結果：<input type="text" class="w-mid">
+      </td>
+    </tr>
+
+    <!-- 既往症 -->
+    <tr>
+      <td class="label">既　往　症</td>
+      <td colspan="3">
+        （1）<label class="opt"><input type="radio" name="kioh"><span class="txt">ある</span></label>：高血圧、低血圧、難聴、ムチウチ病、腰痛、夜盲症 他<br>
+        　　<input type="text" class="w-full"><br>
+        （2）<label class="opt"><input type="radio" name="kioh"><span class="txt">ない</span></label>
+      </td>
+    </tr>
+
+    <!-- 健康状態 / 確認印 -->
+    <tr>
+      <td class="label">健康状態</td>
+      <td colspan="2">
+        現在の健康状態はいかがですか。<br>
+        （1）<label class="opt"><input type="radio" name="kenkou"><span class="txt">良　い</span></label><br>
+        （2）<label class="opt"><input type="radio" name="kenkou"><span class="txt">普　通</span></label><br>
+        （3）<label class="opt"><input type="radio" name="kenkou"><span class="txt">悪　い</span></label>（<input type="text" class="w-long">）
+      </td>
+      <td class="confirm-stamp">
+        <div class="label-small">確認印</div>
+        <div class="stamp-box">
+          <canvas class="stamp-canvas" id="stampCanvas" width="160" height="140"></canvas>
+          <button type="button" class="stamp-clear no-print" onclick="clearStamp()">消去</button>
+        </div>
+      </td>
+    </tr>
+
+    <!-- 誓約文 -->
+    <tr>
+      <td colspan="4" class="footer-text">
+        私は新規入場時教育を受けました。　ついては添付資料に従い作業所の尊守事項や安全基準に従って、安全作業に従事し自分の身の安全を守ります。
+        <div class="sign">
+          令和 <input type="text" class="w-short"> 年
+          <input type="text" class="w-short"> 月
+          <input type="text" class="w-short"> 日<br>
+          氏　名：<input type="text" class="w-xl">
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="doc-no">KAC－0901－04</div>
+
+</div>
+
+<!-- 入力ダイアログ -->
+<div class="modal-overlay no-print" id="inputModal">
+  <div class="modal-box">
+    <div class="modal-title">作業所名を追加</div>
+    <div class="modal-msg">追加する作業所名を入力してください。</div>
+    <input type="text" class="modal-input" id="modalInput" placeholder="例：大井川地区（〇〇）直轄治山工事">
+    <div class="modal-btns">
+      <button onclick="closeInputModal()">キャンセル</button>
+      <button class="primary" onclick="confirmInputModal()">追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- 確認ダイアログ -->
+<div class="modal-overlay no-print" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-title" id="confirmTitle">確認</div>
+    <div class="modal-msg" id="confirmMsg"></div>
+    <div class="modal-btns">
+      <button id="confirmCancelBtn" onclick="closeConfirmModal()">キャンセル</button>
+      <button class="danger" id="confirmOkBtn" onclick="confirmOk()">削除</button>
+    </div>
+  </div>
+</div>
+
+<!-- メッセージダイアログ -->
+<div class="modal-overlay no-print" id="alertModal">
+  <div class="modal-box">
+    <div class="modal-title">お知らせ</div>
+    <div class="modal-msg" id="alertMsg"></div>
+    <div class="modal-btns">
+      <button class="primary" onclick="closeAlertModal()">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ラジオボタンの再クリックで選択解除
+  document.addEventListener('DOMContentLoaded', function() {
+    // すべてのラジオボタン（label.opt 内 + その他）で再クリックで解除
+    document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+      radio.addEventListener('mousedown', function(e) {
+        this._wasChecked = this.checked;
+      });
+      radio.addEventListener('click', function(e) {
+        if (this._wasChecked) {
+          this.checked = false;
+        }
+        this._wasChecked = false;
+      });
+    });
+
+    // 手書きキャンバスを初期化する関数
+    function initHandwriting(canvasId, color, lineWidth) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      let drawing = false;
+      let lastX = 0, lastY = 0;
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const point = (e.touches && e.touches[0]) || e;
+        return {
+          x: (point.clientX - rect.left) * scaleX,
+          y: (point.clientY - rect.top) * scaleY
+        };
+      }
+
+      function start(e) {
+        e.preventDefault();
+        drawing = true;
+        const p = getPos(e);
+        lastX = p.x;
+        lastY = p.y;
+        ctx.beginPath();
+        ctx.arc(lastX, lastY, ctx.lineWidth / 2, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
+      function move(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const p = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        lastX = p.x;
+        lastY = p.y;
+      }
+      function end(e) {
+        drawing = false;
+      }
+
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', move);
+      canvas.addEventListener('mouseup', end);
+      canvas.addEventListener('mouseleave', end);
+      canvas.addEventListener('touchstart', start, { passive: false });
+      canvas.addEventListener('touchmove', move, { passive: false });
+      canvas.addEventListener('touchend', end);
+    }
+
+    // 確認印（朱色）と 氏名（黒）を初期化
+    initHandwriting('stampCanvas', '#c00', 2.5);
+    initHandwriting('nameCanvas', '#000', 2.2);
+
+    // 作業所名リストの復元
+    loadSagyoList();
+
+    // 入力モーダル：Enterで確定
+    const modalInput = document.getElementById('modalInput');
+    if (modalInput) {
+      modalInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          confirmInputModal();
+        } else if (e.key === 'Escape') {
+          closeInputModal();
+        }
+      });
+    }
+  });
+
+  // 作業所名（追加・削除・保存）
+  const SAGYO_KEY = 'sagyoshoList_v1';
+  const SAGYO_DEFAULT = ['大井川地区（東沢）直轄治山工事（R7補正）'];
+  let sagyoList = SAGYO_DEFAULT.slice();
+
+  function loadSagyoList() {
+    const sel = document.getElementById('sagyoSelect');
+    if (!sel) return;
+    let list;
+    try {
+      const saved = localStorage.getItem(SAGYO_KEY);
+      list = saved ? JSON.parse(saved) : SAGYO_DEFAULT.slice();
+    } catch (e) {
+      list = SAGYO_DEFAULT.slice();
+    }
+    if (!Array.isArray(list) || list.length === 0) {
+      list = SAGYO_DEFAULT.slice();
+    }
+    if (!list.includes(SAGYO_DEFAULT[0])) {
+      list.unshift(SAGYO_DEFAULT[0]);
+    }
+    sagyoList = list;
+    renderSagyoSelect();
+  }
+
+  function renderSagyoSelect() {
+    const sel = document.getElementById('sagyoSelect');
+    const current = sel.value;
+    sel.innerHTML = '';
+    sagyoList.forEach(function(name) {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      sel.appendChild(opt);
+    });
+    if (sagyoList.includes(current)) {
+      sel.value = current;
+    }
+  }
+
+  function saveSagyoList() {
+    try {
+      localStorage.setItem(SAGYO_KEY, JSON.stringify(sagyoList));
+    } catch (e) {
+      // localStorageが使えない環境でも動作は継続
+    }
+  }
+
+  // ── 追加 ──
+  function addSagyo() {
+    openInputModal();
+  }
+  function openInputModal() {
+    const modal = document.getElementById('inputModal');
+    const input = document.getElementById('modalInput');
+    input.value = '';
+    modal.classList.add('show');
+    setTimeout(() => input.focus(), 50);
+  }
+  function closeInputModal() {
+    document.getElementById('inputModal').classList.remove('show');
+  }
+  function confirmInputModal() {
+    const input = document.getElementById('modalInput');
+    const name = (input.value || '').trim();
+    if (!name) {
+      showAlert('作業所名を入力してください。');
+      return;
+    }
+    if (sagyoList.includes(name)) {
+      showAlert('同じ作業所名がすでに登録されています。');
+      return;
+    }
+    sagyoList.push(name);
+    renderSagyoSelect();
+    document.getElementById('sagyoSelect').value = name;
+    saveSagyoList();
+    closeInputModal();
+  }
+
+  // ── 削除 ──
+  function removeSagyo() {
+    const sel = document.getElementById('sagyoSelect');
+    if (!sel.value) return;
+    if (sel.value === SAGYO_DEFAULT[0]) {
+      showAlert('既定の作業所「' + SAGYO_DEFAULT[0] + '」は削除できません。');
+      return;
+    }
+    openConfirmModal('「' + sel.value + '」を削除しますか？', function() {
+      const idx = sagyoList.indexOf(sel.value);
+      if (idx >= 0) {
+        sagyoList.splice(idx, 1);
+        renderSagyoSelect();
+        saveSagyoList();
+      }
+    });
+  }
+
+  // ── 確認ダイアログ ──
+  let _confirmCallback = null;
+  function openConfirmModal(msg, callback) {
+    document.getElementById('confirmMsg').textContent = msg;
+    _confirmCallback = callback;
+    document.getElementById('confirmModal').classList.add('show');
+  }
+  function closeConfirmModal() {
+    document.getElementById('confirmModal').classList.remove('show');
+    _confirmCallback = null;
+  }
+  function confirmOk() {
+    if (_confirmCallback) _confirmCallback();
+    closeConfirmModal();
+  }
+
+  // ── アラート ──
+  function showAlert(msg) {
+    document.getElementById('alertMsg').textContent = msg;
+    document.getElementById('alertModal').classList.add('show');
+  }
+  function closeAlertModal() {
+    document.getElementById('alertModal').classList.remove('show');
+  }
+
+  function clearCanvas(id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  function clearStamp() {
+    clearCanvas('stampCanvas');
+  }
+
+  // 西暦→令和 変換
+  function updateWareki() {
+    const input = document.getElementById('jisshiDate');
+    const display = document.getElementById('warekiDisplay');
+    if (!input.value) {
+      display.textContent = '令和　年　月　日';
+      return;
+    }
+    const d = new Date(input.value);
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    // 令和元年 = 2019年5月1日〜
+    let era = '', eraYear = 0;
+    if (y > 2019 || (y === 2019 && (m > 5 || (m === 5 && day >= 1)))) {
+      era = '令和';
+      eraYear = y - 2018;
+    } else if (y > 1989 || (y === 1989 && m >= 1 && day >= 8)) {
+      era = '平成';
+      eraYear = y - 1988;
+    } else {
+      era = '昭和';
+      eraYear = y - 1925;
+    }
+    const yStr = eraYear === 1 ? '元' : eraYear;
+    display.textContent = `${era} ${yStr} 年 ${m} 月 ${day} 日`;
+  }
+</script>
+
+</body>
+</html>
